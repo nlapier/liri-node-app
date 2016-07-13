@@ -1,0 +1,29 @@
+{
+  "name": "liri-node-app",
+  "version": "1.0.0",
+  "description": "LIRI for Twitter",
+  "main": "liri.js",
+  "scripts": {
+    "test": "liri"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nlapier/liri-node-app.git"
+  },
+  "keywords": [
+    "LIRI",
+    "Twitter",
+    "Node"
+  ],
+  "author": "NLP",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nlapier/liri-node-app/issues"
+  },
+  "homepage": "https://github.com/nlapier/liri-node-app#readme",
+  "dependencies": {
+    "request": "^2.73.0",
+    "spotify": "^0.3.0",
+    "twitter": "^1.3.0"
+  }
+}
