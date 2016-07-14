@@ -3,10 +3,36 @@ var imported = require("./keys");
 var twitter = require("twitter");
 var twitterFunc = new twitter(imported.twitterKeys);
 var spotify = require("spotify");
-var request = require('request');
+var request = require("request");
+var fs = require("fs");
 
 var command = process.argv[2];
 var input = process.argv[3];
+
+//=====LIRI Functions======
+function printObj(obj){
+	for (key in obj){
+		console.log(key + ": " + obj[key])
+	}
+}
+
+function liriActivate(){
+	switch (command){
+		case "my-tweets":
+			myTweets();
+			break;
+		case "spotify-this-song":
+			spotifyThis(input);
+			break;
+		case "movie-this":
+			movies(input)
+			break;
+		case "do-what-it-says":
+			doThis();
+			break;
+	}
+}
+//=====LIRI Functions======
 
 //=====Spotify======
 function spotifyObj(artist, song, link, album){
@@ -17,7 +43,6 @@ function spotifyObj(artist, song, link, album){
 }
 
 function spotifyThis(song){
-
 	var ace = 0;
 
 	//Default song, if none is entered
@@ -53,31 +78,86 @@ function spotifyThis(song){
 		//Stores everything in a new object, to be added to  log.txt
 		var songObj = new spotifyObj(artist, song, link, album);
 
-		for (key in songObj){
-			console.log(key + ": " + songObj[key])
-		}
+		printObj(songObj);
 	})
 }
-
 //=====Spotify======
 
 //=====Twitter======
 function myTweets(){
-	twitterFunc.get("search/tweets", {q: "natlapier"}, function(error, tweets, response){
+	//Grabs my twitter feed, up to 20 tweets
+	twitterFunc.get("search/tweets", {q: "natlapier", limit: 20}, function(error, tweets, response){
+		//Loops through all returned tweets, and prints the Tweet's text and time sent
 		var tw = tweets.statuses
+		var tweetObj = new Object();
 		for(var i = 0; i < tw.length; i++){
-			var output = tw[i].created_at;
-			output += ": '";
-			output += tw[i].text;
-			output += "'"
-			console.log(output);
+				var key = tw[i].created_at;
+				var text = "'" + tw[i].text + "'";
+				tweetObj[key] = text;
+		}
+
+		printObj(tweetObj);
+	})
+}
+//=====Twitter======
+
+//=====OBDM======
+function movieObj(title, year, rating, country, language, actors, tomatoMeter, rtURL, plot){
+	this.Title = title,
+	this.Year = year,
+	this.Rating = rating,
+	this.Country = country,
+	this.Language = language,
+	this.Actors = actors,
+	this.Tomatometer = tomatoMeter,
+	this.RT = rtURL,
+	this.Plot = plot
+}
+
+function movies(input){
+	var queryURL = "http://www.omdbapi.com/?t=";
+	request(queryURL + input, function (error, response, body) {
+  		if (!error && response.statusCode == 200) {
+    		var movie = JSON.parse(body);
+    		var newFilm = new movieObj(movie.Title, movie.Year, movie.Rated, movie.Country, movie.Language, movie.Actors, movie.imdbRating, "RT", movie.Plot);
+    		printObj(newFilm);
+    	}
+	})
+}
+//=====OBDM======
+
+//=====Do-what-it-says======
+function doThis(){
+	fs.readFile("./random.txt", "utf8", function(error, data){
+		if(!error){
+			var comma = data.indexOf(",");
+			command = data.slice(0, comma);
+			input = data.slice(comma+1);
+			liriActivate()
 		}
 	})
 }
+//=====Do-what-it-says======
 
-function movies(){}
+liriActivate()
 
-function doThis(){}
+
+
+
+/*Storage
+var comma = data.indexOf(",");
+console.log(comma);
+
+function doThis(){
+	fs.readfile("./random.txt", function(error, data){
+		if(!error){
+			liriActivate()
+		}
+	})
+	
+}
+
+
 
 switch (command){
 	case "my-tweets":
@@ -87,21 +167,32 @@ switch (command){
 		spotifyThis(input);
 		break;
 	case "movie-this":
-		//;
+		movies(input)
+		break;
+	case "do-what-it-says":
+		doThis();
+		break;
+}
+
+function liriActivate(liriCommand, liriInput){
+	switch (liriCommand){
+	case "my-tweets":
+		myTweets();
+		break;
+	case "spotify-this-song":
+		spotifyThis(liriInput);
+		break;
+	case "movie-this":
+		movies(liriInput)
 		break;
 	case "do-what-it-says":
 		//;
 		break;
-	// case "spotifyQ":
-	// 	spotifyQuick(input);
-	// 	break;
+	}
 }
 
+liriActivate(command, input);
 
-
-
-
-/*Storage
 ------Spotify
 var queryURL = "https://api.spotify.com/v1/search";
 
