@@ -32,9 +32,12 @@ function spotifyQuick(song){
 
 function spotifyThis(song){
 
-	var id = "5ksRONqssB7BR161NTtJAm";
+	var ace = 0;
 	//Default song, if none is entered
-	if (!song){song = "The Sign"};
+	if (!song){
+		song = "The Sign",
+		ace = 11;
+	};
 
 	spotify.search({ 
 		type: 'track', 
@@ -46,7 +49,7 @@ function spotifyThis(song){
 	    }
 
 	    //Grab only the first result
-	    var result = data.tracks.items[0];
+	    var result = data.tracks.items[ace];
 
 	    //Grabs all artists 
 		var artist = [];
