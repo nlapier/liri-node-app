@@ -8,6 +8,7 @@ var fs = require("fs");
 
 var command = process.argv[2];
 var input = process.argv[3];
+var log = command + ", " + input + ": ";
 
 //=====LIRI Functions======
 function printObj(obj){
@@ -32,7 +33,15 @@ function liriActivate(){
 			break;
 	}
 }
-//=====LIRI Functions======
+
+function logIt(object){
+	var input = JSON.stringify(object, null, 2);
+
+	fs.appendFile("./log.txt", log + input + "\n", "utf8", function(error){
+		if (error){console.log("Log.txt Error!")}
+		else{console.log("Logged!")}
+	})
+}
 
 //=====Spotify======
 function spotifyObj(artist, song, link, album){
@@ -43,12 +52,14 @@ function spotifyObj(artist, song, link, album){
 }
 
 function spotifyThis(song){
-	var ace = 0;
+	var songIndex = 0;
 
 	//Default song, if none is entered
 	if (!song){
+		// console.log(JSON.stringify(data, null, 2))
+		// return;
 		song = "The Sign",
-		ace = 7;
+		songIndex = 7;
 	};
 
 	spotify.search({ 
@@ -61,7 +72,7 @@ function spotifyThis(song){
 	    }
 
 	    //Grab only the first result
-	    var result = data.tracks.items[ace];
+	    var result = data.tracks.items[songIndex];
 
 	    //Grabs all artists 
 		var artist = [];
@@ -79,9 +90,9 @@ function spotifyThis(song){
 		var songObj = new spotifyObj(artist, song, link, album);
 
 		printObj(songObj);
+		logIt(songObj);
 	})
 }
-//=====Spotify======
 
 //=====Twitter======
 function myTweets(){
@@ -97,20 +108,20 @@ function myTweets(){
 		}
 
 		printObj(tweetObj);
+		logIt(tweetObj);
 	})
 }
-//=====Twitter======
 
-//=====OBDM======
-function movieObj(title, year, rating, country, language, actors, tomatoMeter, rtURL, plot){
+//=====OMDB======
+function movieObj(title, year, rating, country, language, actors, metascore, poster, plot){
 	this.Title = title,
 	this.Year = year,
 	this.Rating = rating,
 	this.Country = country,
 	this.Language = language,
 	this.Actors = actors,
-	this.Tomatometer = tomatoMeter,
-	this.RT = rtURL,
+	this.Metascore = metascore,
+	this.Poster = poster,
 	this.Plot = plot
 }
 
@@ -119,12 +130,12 @@ function movies(input){
 	request(queryURL + input, function (error, response, body) {
   		if (!error && response.statusCode == 200) {
     		var movie = JSON.parse(body);
-    		var newFilm = new movieObj(movie.Title, movie.Year, movie.Rated, movie.Country, movie.Language, movie.Actors, movie.imdbRating, "RT", movie.Plot);
-    		printObj(newFilm);
+    		var filmObj = new movieObj(movie.Title, movie.Year, movie.Rated, movie.Country, movie.Language, movie.Actors, movie.Metascore, movie.Poster, movie.Plot);
+    		printObj(filmObj);
+    		logIt(filmObj);
     	}
 	})
 }
-//=====OBDM======
 
 //=====Do-what-it-says======
 function doThis(){
@@ -137,8 +148,8 @@ function doThis(){
 		}
 	})
 }
-//=====Do-what-it-says======
 
+//=====Run the program!======
 liriActivate()
 
 
